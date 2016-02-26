@@ -1,5 +1,6 @@
 package com.sxkl.markplan.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Repository;
 import com.sxkl.common.utils.PageNoUtil;
 import com.sxkl.markplan.dao.MarkPlanDao;
 import com.sxkl.markplan.model.MarkPlan;
+import com.sxkl.target.model.Target;
+import com.sxkl.target.model.TopScore;
 
 @Repository("markPlanDaoImpl")
 public class MarkPlanDaoImpl extends HibernateDaoSupport implements MarkPlanDao{
@@ -54,9 +57,22 @@ public class MarkPlanDaoImpl extends HibernateDaoSupport implements MarkPlanDao{
 		return count;
 	}
 
-	public MarkPlan getMarkPlanById(String id) {
-		List<MarkPlan> list = (List<MarkPlan>) this.getHibernateTemplate().find("from MarkPlan m where m.id=?", new String[]{id});
-		return list.get(0);
+	@SuppressWarnings("unchecked")
+	public MarkPlan getMarkPlanById(final String id) {
+//		List<MarkPlan> list = (List<MarkPlan>) this.getHibernateTemplate().find("from MarkPlan m where m.id=?", new String[]{id});
+		final String hql = "from MarkPlan m where m.id= :id";
+		List<MarkPlan> datas = (List<MarkPlan>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("id", id);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
+		return datas.get(0);
 	}
 
 	public void updateMarkPlan(MarkPlan mp) {

@@ -40,10 +40,23 @@ public class TargetDaoImpl extends HibernateDaoSupport implements TargetDao{
 		return null;
 	}
 
-	public List<Target> getTargetsByLevel(int level) {
-		String hql = "from Target t where t.level=?";
-		Integer[] param = new Integer[]{level};
-		List<Target> data = (List<Target>) this.getHibernateTemplate().find(hql,param);
+	@SuppressWarnings("unchecked")
+	public List<Target> getTargetsByLevel(final int level) {
+//		String hql = "from Target t where t.level=?";
+//		Integer[] param = new Integer[]{level};
+//		List<Target> data = (List<Target>) this.getHibernateTemplate().find(hql,param);
+		final String hql = "from Target t where t.level= :level";
+		List<Target> data = (List<Target>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("level", level);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(data != null && data.size() > 0){
 			return data;
 		}
@@ -70,12 +83,26 @@ public class TargetDaoImpl extends HibernateDaoSupport implements TargetDao{
 		return new ArrayList<Target>();
 	}
 
-	public Target getTargetById(String id) {
-		String hql = "from Target t where t.id=?";
-		String[] param = new String[]{id};
-		List<Target> data = (List<Target>) this.getHibernateTemplate().find(hql,param);
-		if(data != null && data.size() > 0){
-			return data.get(0);
+	@SuppressWarnings("unchecked")
+	public Target getTargetById(final String id) {
+		try {
+			final String hql = "from Target t where t.id = :id";
+			List<Target> data = (List<Target>) this.getHibernateTemplate().execute(new HibernateCallback(){
+				public Object doInHibernate(Session session) throws HibernateException {
+					Query query = session.createQuery(hql);
+					query.setParameter("id", id);
+					List<Target> list = query.list();
+					if(list == null || list.size() == 0){
+						return new ArrayList<Target>();
+					}
+					return list;
+				}
+			});
+			if(data != null && data.size() > 0){
+				return data.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -88,20 +115,46 @@ public class TargetDaoImpl extends HibernateDaoSupport implements TargetDao{
 		this.getHibernateTemplate().delete(target);
 	}
 
-	public List<Target> getChildTargetById(String id) {
-		String hql = "from Target t where t.parent.id=?";
-		String[] param = new String[]{id};
-		List<Target> data = (List<Target>) this.getHibernateTemplate().find(hql,param);
+	@SuppressWarnings("unchecked")
+	public List<Target> getChildTargetById(final String id) {
+//		String hql = "from Target t where t.parent.id=?";
+//		String[] param = new String[]{id};
+//		List<Target> data = (List<Target>) this.getHibernateTemplate().find(hql,param);
+		final String hql = "from Target t where t.parent.id= :id";
+		List<Target> data = (List<Target>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("id", id);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(data != null && data.size() > 0){
 			return data;
 		}
 		return new ArrayList<Target>();
 	}
 
-	public List<TargetData> getTargetDatasByMarkPlanId(String markPlanId) {
-		String hql = "from TargetData t where t.markPlan.id=?";
-		String[] param = new String[]{markPlanId};
-		List<TargetData> data = (List<TargetData>) this.getHibernateTemplate().find(hql,param);
+	@SuppressWarnings("unchecked")
+	public List<TargetData> getTargetDatasByMarkPlanId(final String markPlanId) {
+//		String hql = "from TargetData t where t.markPlan.id=?";
+//		String[] param = new String[]{markPlanId};
+//		List<TargetData> data = (List<TargetData>) this.getHibernateTemplate().find(hql,param);
+		final String hql = "from TargetData t where t.markPlan.id= :markPlanId";
+		List<TargetData> data = (List<TargetData>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("markPlanId", markPlanId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(data != null && data.size() > 0){
 			return data;
 		}
@@ -112,10 +165,24 @@ public class TargetDaoImpl extends HibernateDaoSupport implements TargetDao{
 		this.getHibernateTemplate().save(data);
 	}
 
-	public TargetData getTargetDatasByTargetIdAndMarkPlanId(String targetId,String markPlanId) {
-		String hql = "from TargetData t where t.target.id=? and t.markPlan.id=?";
-		String[] param = new String[]{targetId,markPlanId};
-		List<TargetData> data = (List<TargetData>) this.getHibernateTemplate().find(hql,param);
+	@SuppressWarnings("unchecked")
+	public TargetData getTargetDatasByTargetIdAndMarkPlanId(final String targetId,final String markPlanId) {
+//		String hql = "from TargetData t where t.target.id=? and t.markPlan.id=?";
+//		String[] param = new String[]{targetId,markPlanId};
+//		List<TargetData> data = (List<TargetData>) this.getHibernateTemplate().find(hql,param);
+		final String hql = "from TargetData t where t.target.id= :targetId and t.markPlan.id= :markPlanId";
+		List<TargetData> data = (List<TargetData>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("targetId", targetId);
+				query.setParameter("markPlanId", markPlanId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(data != null && data.size() > 0){
 			return data.get(0);
 		}
@@ -163,10 +230,24 @@ public class TargetDaoImpl extends HibernateDaoSupport implements TargetDao{
 		return targets;
 	}
 
-	public List<TopScore> getTopScoreByMarkPlanIdAndPersonId(String markPlanId,String personId) {
-		String hql = "from TopScore ts where ts.markPlan.id=? and ts.person.id=?";
-		String[] params = new String[]{markPlanId,personId};
-		List<TopScore> datas = (List<TopScore>) this.getHibernateTemplate().find(hql, params);
+	@SuppressWarnings("unchecked")
+	public List<TopScore> getTopScoreByMarkPlanIdAndPersonId(final String markPlanId,final String personId) {
+//		String hql = "from TopScore ts where ts.markPlan.id=? and ts.person.id=?";
+//		String[] params = new String[]{markPlanId,personId};
+//		List<TopScore> datas = (List<TopScore>) this.getHibernateTemplate().find(hql, params);
+		final String hql = "from TopScore ts where ts.markPlan.id= :markPlanId and ts.person.id= :personId";
+		List<TopScore> datas = (List<TopScore>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("markPlanId", markPlanId);
+				query.setParameter("personId", personId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(datas == null){
 			return new ArrayList<TopScore>();
 		}

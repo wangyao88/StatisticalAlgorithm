@@ -65,10 +65,23 @@ public class PersonDaoImpl extends HibernateDaoSupport implements PersonDao{
 		return count;
 	}
 
-	public Person getPersonById(String personId) {
-		String hql = "from Person p where p.id=?";
-		String[] param = new String[]{personId};
-		List<Person> persons = (List<Person>) this.getHibernateTemplate().find(hql, param);
+	@SuppressWarnings("unchecked")
+	public Person getPersonById(final String personId) {
+//		String hql = "from Person p where p.id=?";
+//		String[] param = new String[]{personId};
+//		List<Person> persons = (List<Person>) this.getHibernateTemplate().find(hql, param);
+		final String hql = "from Person p where p.id= :id";
+		List<Person> persons = (List<Person>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("id", personId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(persons !=null && persons.size() > 0){
 			return persons.get(0);
 		}

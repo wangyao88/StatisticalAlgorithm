@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.sxkl.common.utils.PageNoUtil;
 import com.sxkl.score.dao.ScoreDao;
 import com.sxkl.score.model.Score;
+import com.sxkl.target.model.Target;
 
 @Repository("scoreDaoImpl")
 public class ScoreDaoImpl extends HibernateDaoSupport implements ScoreDao{
@@ -41,27 +43,69 @@ public class ScoreDaoImpl extends HibernateDaoSupport implements ScoreDao{
 		this.getHibernateTemplate().save(scoreBean);
 	}
 
-	public Score getScoreByParam(String markPlanId, String personId,String targetId) {
-		String hql = "from Score s where s.markPlan.id=? and s.target.id=? and s.person.id=?";
-		String[] param = new String[]{markPlanId,targetId,personId};
-		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+	@SuppressWarnings("unchecked")
+	public Score getScoreByParam(final String markPlanId, final String personId,final String targetId) {
+//		String hql = "from Score s where s.markPlan.id=? and s.target.id=? and s.person.id=?";
+//		String[] param = new String[]{markPlanId,targetId,personId};
+//		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+		final String hql = "from Score s where s.markPlan.id= :markPlanId and s.target.id= :targetId and s.person.id= :personId";
+		List<Score> scores = (List<Score>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("markPlanId", markPlanId);
+				query.setParameter("targetId", targetId);
+				query.setParameter("personId", personId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(scores != null && scores.size() > 0){
 			return scores.get(0);
 		}
 		return null;
 	}
 
-	public List<Score> checkMarkByMarkPlanId(String markPlanId) {
-		String hql = "from Score s where s.markPlan.id=?";
-		String[] param = new String[]{markPlanId};
-		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+	@SuppressWarnings("unchecked")
+	public List<Score> checkMarkByMarkPlanId(final String markPlanId) {
+//		String hql = "from Score s where s.markPlan.id=?";
+//		String[] param = new String[]{markPlanId};
+//		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+		final String hql = "from Score s where s.markPlan.id= :markPlanId";
+		List<Score> scores = (List<Score>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("markPlanId", markPlanId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		return scores;
 	}
 
-	public List<Score> getScoreByPersonAndMarkPlan(String personId,String markPlanId) {
-		String hql = "from Score s where s.person.id=? and s.markPlan.id=? order by s.target.level asc";
-		String[] param = new String[]{personId,markPlanId};
-		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+	@SuppressWarnings("unchecked")
+	public List<Score> getScoreByPersonAndMarkPlan(final String personId,final String markPlanId) {
+//		String hql = "from Score s where s.person.id=? and s.markPlan.id=? order by s.target.level asc";
+//		String[] param = new String[]{personId,markPlanId};
+//		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+		final String hql = "from Score s where s.person.id= :personId and s.markPlan.id= :markPlanId order by s.target.level asc";
+		List<Score> scores = (List<Score>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("personId", personId);
+				query.setParameter("markPlanId", markPlanId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(scores == null){
 			return new ArrayList<Score>();
 		}
@@ -72,10 +116,23 @@ public class ScoreDaoImpl extends HibernateDaoSupport implements ScoreDao{
 		this.getHibernateTemplate().update(temp);
 	}
 
-	public List<Score> getScoreByMarkPlanId(String markPlanId) {
-		String hql = "from Score s where s.markPlan.id=? order by s.target.level asc";
-		String[] param = new String[]{markPlanId};
-		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+	@SuppressWarnings("unchecked")
+	public List<Score> getScoreByMarkPlanId(final String markPlanId) {
+//		String hql = "from Score s where s.markPlan.id=? order by s.target.level asc";
+//		String[] param = new String[]{markPlanId};
+//		List<Score> scores =  (List<Score>) this.getHibernateTemplate().find(hql, param);
+		final String hql = "from Score s where s.markPlan.id= :markPlanId order by s.target.level asc";
+		List<Score> scores = (List<Score>) this.getHibernateTemplate().execute(new HibernateCallback(){
+			public Object doInHibernate(Session session) throws HibernateException {
+				Query query = session.createQuery(hql);
+				query.setParameter("markPlanId", markPlanId);
+				List<Target> list = query.list();
+				if(list == null || list.size() == 0){
+					return new ArrayList<Target>();
+				}
+				return list;
+			}
+		});
 		if(scores == null){
 			return new ArrayList<Score>();
 		}
